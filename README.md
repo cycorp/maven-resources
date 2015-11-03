@@ -1,4 +1,5 @@
-Maven Parent POMs
-=================
+Maven Resources
+===============
 
-This project is for collecting any parent POMs which are likely to be reused across projects.
+This project is for collecting general Maven resources such as parent POMs, archetypes, etc.
+
