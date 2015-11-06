@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>com.cyc</groupId>
+    <artifactId>cyc-sonatype-oss-parent</artifactId>
+    <version>1.0.0-rc1</version>
+  </parent>
+  
+  <groupId>com.cyc</groupId>
+  <artifactId>cyc-default-config-parent</artifactId>
+  <version>0.1.0</version>
+  <packaging>pom</packaging>
+  
+  <name>Cyc Default Config Parent</name>
+  <description>
+    Provides default properties, dependencyManagement, and pluginManagement for many of Cycorp's
+    open source Java projects. This pom does not mandate the inclusion of any dependencies or 
+    plugins, and does not perform a reactor build.
+  </description>
+  <url>http://dev.cyc.com/</url>
+  
+  <scm>
+    <connection>scm:git:git@github.com:cycorp/CycMavenResources.git</connection>
+    <developerConnection>scm:git:git@github.com:cycorp/CycMavenResources.git</developerConnection>
+    <url>https://github.com/cycorp/CycMavenResources</url>
+  </scm>
+  
+  <issueManagement>
+    <url>http://dev.cyc.com/issues/</url>
+    <system>GitHub Issues</system>
+  </issueManagement>
+  
+  <inceptionYear>2015</inceptionYear>
+  
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  
+  <organization>
+    <name>Cycorp, Inc.</name>
+    <url>http://www.cyc.com</url>
+  </organization>
+  
+  <developers>
+    <developer>
+      <name>Cycorp API Team</name>
+      <email>dev-team@cyc.com</email>
+      <organization>Cycorp, Inc.</organization>
+      <organizationUrl>http://www.cyc.com</organizationUrl>
+    </developer>
+  </developers>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+    <maven-compiler-plugin.source>1.6</maven-compiler-plugin.source>
+    <maven-compiler-plugin.target>1.6</maven-compiler-plugin.target>
+    
+    <!-- Library versions -->
+    <cyc-core-suite.version>1.0.0-rc2</cyc-core-suite.version>
+    <jackson-core.version>2.5.1</jackson-core.version>
+    
+    <!-- maven.build.timestamp doesn't make it through to the filtering mechanism,
+         so we need to store it in another property. Details: 
+         http://java.dzone.com/tips/stamping-version-number-and
+    -->
+    <timestamp>${maven.build.timestamp}</timestamp>
+    <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
+    <!--
+    <project.root>${project.basedir}</project.root>
+    -->
+  </properties>
+  
+  <!--
+  This pom does not perform a reactor build.
+  <modules></modules>
+  -->
+  
+  <dependencyManagement>
+    <dependencies>
+      <!-- Cyc libraries -->
+      <dependency>
+        <groupId>com.cyc</groupId>
+        <artifactId>cyc-core-api</artifactId>
+        <version>${cyc-core-suite.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cyc</groupId>
+        <artifactId>cyc-core-suite</artifactId>
+        <version>${cyc-core-suite.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cyc</groupId>
+        <artifactId>cyc-core-suite</artifactId>
+        <classifier>jar-with-dependencies</classifier>
+        <version>${cyc-core-suite.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cyc.json</groupId>
+        <artifactId>cyc-core-json</artifactId>
+        <version>1.0.0-rc2-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cyc.xml</groupId>
+        <artifactId>cyc-core-xml</artifactId>
+        <version>1.0.0-rc2-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cyc.xml</groupId>
+        <artifactId>cyc-lightweight-result-set</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+      </dependency>
+      
+      <!-- External libraries -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.12</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.12</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>1.7.12</version>
+      </dependency>
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.17</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${jackson-core.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson-core.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson-core.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
+  <!--
+  This pom does not mandate the inclusion of any dependencies.
+  <dependencies></dependencies>
+  -->
+  
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <configuration>
+            <source>${maven-compiler-plugin.source}</source>
+            <target>${maven-compiler-plugin.target}</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${maven-source-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>attach-sources</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
+          <artifactId>svn-revision-number-maven-plugin</artifactId>
+          <version>1.13</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.tmatesoft.svnkit</groupId>
+              <artifactId>svnkit</artifactId>
+              <version>1.8.5</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>1.7</version>
+          <configuration>
+            <verbose>false</verbose>
+            <addSvnKeyWords>false</addSvnKeyWords>
+            <canUpdateDescription>true</canUpdateDescription>
+            <descriptionTemplate>${project.root}/src/resources/headerTemplate.ftl</descriptionTemplate>
+            <canUpdateCopyright>true</canUpdateCopyright>
+          </configuration>
+          <executions>
+            <execution>
+              <id>first</id>
+              <goals>
+                <goal>update-file-header</goal>
+              </goals>
+              <phase>process-sources</phase>
+              <configuration>
+                <licenseName>apache_v2</licenseName>
+                <roots>
+                  <root>src/main/java</root>
+                  <root>src/test</root>
+                </roots>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <!--
+          Versions of this plugin earlier than 0.9.0 may cause throw
+          accessExternalSchema errors on Java 8.
+          http://stackoverflow.com/a/26349908/786623
+          -->
+          <groupId>org.jvnet.jaxb2.maven2</groupId>
+          <artifactId>maven-jaxb2-plugin</artifactId>
+          <version>0.10.0</version>
+          <configuration>
+            <catalog>src/main/resources/jaxb/catalog.xml</catalog>
+            <catalogResolver>org.jvnet.jaxb2.maven2.resolver.tools.ClasspathCatalogResolver</catalogResolver>
+            <generateDirectory>${project.build.directory}/generated-sources/xjc</generateDirectory>
+            <!--
+            <forceRegenerate>true</forceRegenerate>
+            <verbose>true</verbose>
+            -->
+            <forceRegenerate>false</forceRegenerate>
+            <verbose>false</verbose>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    
+    <!--
+    This pom does not mandate the inclusion of any plugins.
+    <plugins></plugins>
+    -->
+  </build>
+  
+  <profiles>
+    <!-- ====  Java 8 doc linting profile ====================================================== -->
+    <profile>
+      <id>doclint-java8-disable</id>
+      <activation>
+        <jdk>1.8</jdk>
+      </activation> 
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <configuration>
+                <additionalparam>-Xdoclint:none</additionalparam>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    
+    <!-- ====  Java 7 doc linting profile ====================================================== -->
+    <profile>
+      <id>doclint-java7-enable</id>
+      <activation>
+        <jdk>1.7</jdk>
+      </activation>
+      <!--
+      Nothing much to see here...
+      -->
+    </profile>
+  </profiles>
+  
+</project>

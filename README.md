@@ -1,5 +1,11 @@
-Maven Resources
-===============
+Cyc Maven Resources
+===================
 
-This project is for collecting general Maven resources such as parent POMs, archetypes, etc.
+This repository collects general Maven resources such as parent POMs, archetypes, etc.
+
+
+Further Documentation
+---------------------
+
+For more information about Cyc open source software, visit the [Cyc Developer Center](http://dev.cyc.com/).
 
