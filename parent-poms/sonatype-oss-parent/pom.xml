@@ -6,19 +6,21 @@
   
   <groupId>com.cyc</groupId>
   <artifactId>cyc-sonatype-oss-parent</artifactId>
-  <version>1.0.0-rc1</version>
+  <version>1.0.0-rc2</version>
   <packaging>pom</packaging>
   
-  <name>Cyc Sonatype OSS Parent</name>
+  <!-- ====  Metadata & contact info  ========================================================== -->
+  
+  <name>Sonatype OSS Parent</name>
   <description>
     Provides Sonatype deployment profile for Cycorp's open source software.
   </description>
   <url>http://dev.cyc.com/</url>
 
   <scm>
-    <connection>scm:git:git@github.com:cycorp/CycMavenResources.git</connection>
-    <developerConnection>scm:git:git@github.com:cycorp/CycMavenResources.git</developerConnection>
-    <url>https://github.com/cycorp/CycMavenResources</url>
+    <connection>scm:git:git@github.com:cycorp/maven-resources.git</connection>
+    <developerConnection>scm:git:git@github.com:cycorp/maven-resources.git</developerConnection>
+    <url>https://github.com/cycorp/maven-resources</url>
   </scm>
   
   <issueManagement>
@@ -49,6 +51,16 @@
     </developer>
   </developers>
   
+  <!-- ====  Configuration  ==================================================================== -->
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven-source-plugin.version>2.3</maven-source-plugin.version>
+    <maven-javadoc-plugin.version>2.10.1</maven-javadoc-plugin.version>
+    <maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
+    <nexus-staging-maven-plugin.version>1.6.5</nexus-staging-maven-plugin.version>
+  </properties>
+  
   <distributionManagement>
     <snapshotRepository>
       <id>ossrh</id>
@@ -59,14 +71,6 @@
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
   </distributionManagement>
-  
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven-source-plugin.version>2.3</maven-source-plugin.version>
-    <maven-javadoc-plugin.version>2.10.1</maven-javadoc-plugin.version>
-    <maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
-    <nexus-staging-maven-plugin.version>1.6.5</nexus-staging-maven-plugin.version>
-  </properties>
   
   <profiles>
     <!-- ====  Sonatype release profile  ======================================================= -->
@@ -120,6 +124,30 @@
               <configuration>
                 <author>false</author>
                 <version>false</version>
+                <detectOfflineLinks>false</detectOfflineLinks>
+                <tags>
+                  <tag>
+                    <name>date</name>
+                    <!-- The value X makes javadoc ignore the tag -->
+                    <placement>X</placement>
+                  </tag>
+                  <tag>
+                    <name>note</name>
+                    <placement>X</placement>
+                  </tag>
+                  <tag>
+                    <name>owner</name>
+                    <placement>X</placement>
+                  </tag>
+                  <tag>
+                    <name>privacy</name>
+                    <placement>X</placement>
+                  </tag>                        
+                  <tag>
+                    <name>obsolete</name>
+                    <placement>X</placement>
+                  </tag>
+                </tags>
               </configuration>
               <executions>
                 <execution>

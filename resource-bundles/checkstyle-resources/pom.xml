@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>com.cyc</groupId>
+    <artifactId>cyc-sonatype-oss-parent</artifactId>
+    <version>1.0.0-rc2</version>
+    <relativePath>../../parent-poms/sonatype-oss-parent</relativePath>
+  </parent>
+  
+  <groupId>com.cyc.maven</groupId>
+  <artifactId>cyc-checkstyle-resources</artifactId>
+  <version>0.1.0</version>
+  <packaging>jar</packaging>
+  
+  <name>Checkstyle Resources</name>
+  
+  <description>
+    Provides resources (such as configuration files) for the Maven Checkstyle Plugin 
+    (https://maven.apache.org/plugins/maven-checkstyle-plugin/index.html).
+  </description>
+  <url>http://dev.cyc.com/</url>
+  
+  <scm>
+    <connection>scm:git:git@github.com:cycorp/maven-resources.git</connection>
+    <developerConnection>scm:git:git@github.com:cycorp/maven-resources.git</developerConnection>
+    <url>https://github.com/cycorp/maven-resources</url>
+  </scm>
+  
+  <issueManagement>
+    <url>http://dev.cyc.com/issues/</url>
+    <system>GitHub Issues</system>
+  </issueManagement>
+  
+  <inceptionYear>2015</inceptionYear>
+  
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  
+  <organization>
+    <name>Cycorp, Inc.</name>
+    <url>http://www.cyc.com</url>
+  </organization>
+  
+  <developers>
+    <developer>
+      <name>Cycorp API Team</name>
+      <email>dev-team@cyc.com</email>
+      <organization>Cycorp, Inc.</organization>
+      <organizationUrl>http://www.cyc.com</organizationUrl>
+    </developer>
+  </developers>
+  
+</project>

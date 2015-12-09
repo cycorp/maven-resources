@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>com.cyc.aggregate</groupId>
+  <artifactId>cyc-maven-resources</artifactId>
+  <version>0.1.0</version>
+  <packaging>pom</packaging>
+  
+  <name>Maven Resources Aggegrator POM</name>
+  <description>
+    Builds all Maven resource projects.
+  </description>
+  <url>http://dev.cyc.com/</url>
+  
+  <properties>
+  </properties>
+  
+  <modules>
+    <module>parent-poms/sonatype-oss-parent</module>
+    <module>parent-poms/default-config-parent</module>
+    <module>resource-bundles/checkstyle-resources</module>
+    <module>resource-bundles/source-template-resources</module>
+  </modules>
+
+</project>
