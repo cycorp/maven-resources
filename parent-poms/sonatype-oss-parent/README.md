@@ -1,6 +1,8 @@
 Cyc Sonatype OSS Parent
 =======================
 
+[![Maven Central](https://img.shields.io/maven-central/v/com.cyc/cyc-sonatype-oss-parent.svg)]()
+
 Provides Sonatype deployment configuration for Cycorp's open source software.
 
 
