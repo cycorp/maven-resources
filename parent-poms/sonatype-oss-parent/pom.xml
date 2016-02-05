@@ -6,7 +6,7 @@
   
   <groupId>com.cyc</groupId>
   <artifactId>cyc-sonatype-oss-parent</artifactId>
-  <version>1.0.0-rc3</version>
+  <version>1.0.0</version>
   <packaging>pom</packaging>
   
   <!-- ====  Metadata & contact info  ========================================================== -->
