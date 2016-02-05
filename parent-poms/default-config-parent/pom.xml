@@ -7,13 +7,13 @@
   <parent>
     <groupId>com.cyc</groupId>
     <artifactId>cyc-sonatype-oss-parent</artifactId>
-    <version>1.0.0-rc3</version>
+    <version>1.0.0</version>
     <relativePath>../sonatype-oss-parent</relativePath>
   </parent>
   
   <groupId>com.cyc</groupId>
   <artifactId>cyc-default-config-parent</artifactId>
-  <version>1.0.0-rc1</version>
+  <version>1.0.0-rc2</version>
   <packaging>pom</packaging>
   
   <!-- ====  Metadata & contact info  ========================================================== -->
@@ -69,8 +69,9 @@
     <maven-compiler-plugin.target>1.6</maven-compiler-plugin.target>
     
     <!-- Library versions -->
-    <cyc-core-api.version>1.0.0-rc2</cyc-core-api.version>
-    <cyc-core-suite.version>${cyc-core-api.version}</cyc-core-suite.version>
+    <cyc-core-api.version>1.0.0-rc5</cyc-core-api.version>
+    <cyc-core-client-impl.version>1.0.0-rc5.2</cyc-core-client-impl.version>
+    
     <jackson-core.version>2.5.4</jackson-core.version>
     
     <!-- maven.build.timestamp doesn't make it through to the filtering mechanism,
@@ -86,6 +87,13 @@
     <maven-checkstyle-plugin.configLocation>google_checks-no_javadoc.xml</maven-checkstyle-plugin.configLocation>
     <maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
     <license-maven-plugin.descriptionTemplate>headerTemplate.ftl</license-maven-plugin.descriptionTemplate>
+    
+    <!--
+    Version 2.2 of versions-maven-plugin throws a java.io.FileNotFoundException on mvn versions:set
+    https://github.com/mojohaus/versions-maven-plugin/issues/44
+    -->
+    <versions-maven-plugin.version>2.1</versions-maven-plugin.version>
+    <versions-maven-plugin.generateBackupPoms>false</versions-maven-plugin.generateBackupPoms>
   </properties>
   
   <!--
@@ -95,7 +103,7 @@
   
   <dependencyManagement>
     <dependencies>
-      <!-- Cyc libraries -->
+      <!-- Core API -->
       <dependency>
         <groupId>com.cyc</groupId>
         <artifactId>cyc-core-api</artifactId>
@@ -103,32 +111,52 @@
       </dependency>
       <dependency>
         <groupId>com.cyc</groupId>
-        <artifactId>cyc-core-suite</artifactId>
-        <version>${cyc-core-suite.version}</version>
+        <artifactId>cyc-core-api</artifactId>
+        <classifier>jar-with-dependencies</classifier>
+        <version>${cyc-core-api.version}</version>
+      </dependency>
+      
+      <!-- Core Client Impl -->
+      <dependency>
+        <groupId>com.cyc</groupId>
+        <artifactId>cyc-core-client-impl</artifactId>
+        <version>${cyc-core-client-impl.version}</version>
       </dependency>
       <dependency>
         <groupId>com.cyc</groupId>
-        <artifactId>cyc-core-suite</artifactId>
+        <artifactId>cyc-core-client-impl</artifactId>
         <classifier>jar-with-dependencies</classifier>
-        <version>${cyc-core-suite.version}</version>
+        <version>${cyc-core-client-impl.version}</version>
       </dependency>
-      <!--
-      <dependency>
-        <groupId>com.cyc.json</groupId>
-        <artifactId>cyc-core-json</artifactId>
-        <version>1.0.0-rc2-SNAPSHOT</version>
-      </dependency>
+      
+      <!-- Cyc XML-related libraries -->
       <dependency>
         <groupId>com.cyc.xml</groupId>
         <artifactId>cyc-core-xml</artifactId>
-        <version>1.0.0-rc2-SNAPSHOT</version>
+        <version>1.0.0-rc5-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>com.cyc.xml</groupId>
-        <artifactId>cyc-lightweight-result-set</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <artifactId>cyc-cycconcepts</artifactId>
+        <version>1.0.0</version>
       </dependency>
-      -->
+      <dependency>
+        <groupId>com.cyc.xml</groupId>
+        <artifactId>cyc-lightweightresultset</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cyc.xml</groupId>
+        <artifactId>cyc-textprocessing</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+      
+      <!-- Other Cyc libraries -->
+      <dependency>
+        <groupId>com.cyc.json</groupId>
+        <artifactId>cyc-core-json</artifactId>
+        <version>1.0.0-rc5-SNAPSHOT</version>
+      </dependency>
       
       <!-- Test-scope libraries -->
       <dependency>
@@ -215,8 +243,8 @@
       <!-- ====  Apache plugins (i.e., groupId=org.apache.maven.plugins)  ====================== -->
       <plugins>
         <plugin>
-          <!-- NOTE: We don't need a groupId specification because the group is
-              org.apache.maven.plugins ...which is assumed by default.
+          <!-- NOTE: We don't need a groupId specification when the group is
+              org.apache.maven.plugins, because this is assumed by default.
           -->
           <artifactId>maven-antrun-plugin</artifactId>
           <version>1.8</version>
@@ -324,8 +352,12 @@
           </executions>
         </plugin>
         <plugin>
+          <!--
+          Version 2.19 breaks running single test in NetBeans.
+          See: https://netbeans.org/projects/java/lists/junit-issues/archive/2015-11/message/2
+          -->
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.19</version>
+          <version>2.18</version>
           <executions>
             <execution>
               <id>default-test</id>
@@ -398,6 +430,15 @@
           </dependencies>
         </plugin>
         <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>${versions-maven-plugin.version}</version>
+          <configuration>
+            <!-- Determines whether to generate pom.xml.versionsBackup files -->
+            <generateBackupPoms>${versions-maven-plugin.generateBackupPoms}</generateBackupPoms>
+          </configuration>
+        </plugin>
+        <plugin>
           <!--
           Versions of this plugin earlier than 0.9.0 may cause throw
           accessExternalSchema errors on Java 8.
@@ -406,14 +447,14 @@
           <groupId>org.jvnet.jaxb2.maven2</groupId>
           <artifactId>maven-jaxb2-plugin</artifactId>
           <version>0.10.0</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>generate</goal>
+              </goals>
+            </execution>
+          </executions>
           <configuration>
-            <catalog>src/main/resources/jaxb/catalog.xml</catalog>
-            <catalogResolver>org.jvnet.jaxb2.maven2.resolver.tools.ClasspathCatalogResolver</catalogResolver>
-            <generateDirectory>${project.build.directory}/generated-sources/xjc</generateDirectory>
-            <!--
-            <forceRegenerate>true</forceRegenerate>
-            <verbose>true</verbose>
-            -->
             <forceRegenerate>false</forceRegenerate>
             <verbose>false</verbose>
           </configuration>
