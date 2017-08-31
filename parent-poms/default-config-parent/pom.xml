@@ -13,17 +13,19 @@
   
   <groupId>com.cyc</groupId>
   <artifactId>cyc-default-config-parent</artifactId>
-  <version>1.0.0-rc2</version>
+  <version>1.0.0-rc6</version>
   <packaging>pom</packaging>
   
-  <!-- ====  Metadata & contact info  ========================================================== -->
+  <!-- ====|    Metadata & contact info    |=================================================== -->
   
   <name>Default Config Parent</name>
+  
   <description>
     Provides default properties, dependencyManagement, and pluginManagement for many of Cycorp's
     open source Java projects. This pom does not mandate the inclusion of any dependencies or 
     plugins, and does not perform a reactor build.
   </description>
+  
   <url>http://dev.cyc.com/</url>
   
   <scm>
@@ -60,7 +62,7 @@
     </developer>
   </developers>
   
-  <!-- ====  Configuration  ==================================================================== -->
+  <!-- ====|    Configuration    |============================================================= -->
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -69,10 +71,11 @@
     <maven-compiler-plugin.target>1.6</maven-compiler-plugin.target>
     
     <!-- Library versions -->
-    <cyc-core-api.version>1.0.0-rc5</cyc-core-api.version>
-    <cyc-core-client-impl.version>1.0.0-rc5.2</cyc-core-client-impl.version>
+    <cyc-core-api.version>1.0.0-rc6</cyc-core-api.version>
+    <cyc-core-client-impl.version>1.0.0-rc6</cyc-core-client-impl.version>
+    <cyc-site-skin.version>1.0.0-rc2</cyc-site-skin.version>
     
-    <jackson-core.version>2.5.4</jackson-core.version>
+    <jackson-core.version>2.8.6</jackson-core.version>
     
     <!-- maven.build.timestamp doesn't make it through to the filtering mechanism,
          so we need to store it in another property. Details: 
@@ -153,9 +156,14 @@
       
       <!-- Other Cyc libraries -->
       <dependency>
+        <groupId>com.cyc.common</groupId>
+        <artifactId>cyc-core-serialization</artifactId>
+        <version>1.0.0-rc6-SNAPSHOT</version>
+      </dependency>
+      <dependency>
         <groupId>com.cyc.json</groupId>
         <artifactId>cyc-core-json</artifactId>
-        <version>1.0.0-rc5-SNAPSHOT</version>
+        <version>1.0.0-rc6-SNAPSHOT</version>
       </dependency>
       
       <!-- Test-scope libraries -->
@@ -226,9 +234,14 @@
         <version>18.0</version>
       </dependency>
       <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>2.6</version>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.4</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.5</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -252,11 +265,6 @@
         <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>2.6</version>
-          <configuration>
-            <descriptorRefs>
-              <descriptorRef>jar-with-dependencies</descriptorRef>
-            </descriptorRefs>
-          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-checkstyle-plugin</artifactId>
