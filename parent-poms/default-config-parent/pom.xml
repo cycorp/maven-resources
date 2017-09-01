@@ -8,15 +8,17 @@
     <groupId>com.cyc</groupId>
     <artifactId>cyc-sonatype-oss-parent</artifactId>
     <version>1.0.0</version>
-    <relativePath>../sonatype-oss-parent</relativePath>
+    <!-- 
+        Set relativePath to an empty string to force Maven to check the repository.
+        See: http://maven.apache.org/ref/3.0.3/maven-model/maven.html#class_parent
+    <relativePath>../sonatype-oss-parent</relativePath -->
+    <relativePath></relativePath>
   </parent>
   
   <groupId>com.cyc</groupId>
   <artifactId>cyc-default-config-parent</artifactId>
-  <version>1.0.0-rc6</version>
+  <version>1.0.0-rc7.0</version>
   <packaging>pom</packaging>
-  
-  <!-- ====|    Metadata & contact info    |=================================================== -->
   
   <name>Default Config Parent</name>
   
@@ -25,6 +27,640 @@
     open source Java projects. This pom does not mandate the inclusion of any dependencies or 
     plugins, and does not perform a reactor build.
   </description>
+  
+  <!--
+      POM LAYOUT:
+      
+      - properties
+      - dependencyManagement
+      - build (pluginManagement)
+      - profiles
+      - dependencies (none)
+      - modules (none)
+      - Metadata & contact info (url, licenses, scm, etc.)
+  -->
+  
+  <!-- ====|    Configuration    |============================================================== -->
+  
+  <!--
+      POM LAYOUT:
+      
+      - modules (none)
+      - properties
+      - dependencyManagement
+      - dependencies (none)
+      - modules (none)
+      - build (pluginManagement)
+      - profiles
+      - Metadata & contact info
+      
+      PROPERTY NAMING CONVENTIONS:
+      
+      Typically, a property name is a dot-delimited path of hierarchical field names, ending in
+      the name of the field whose value it represents. The path does not need to be absolute, and
+      portions can be omitted for clarity, but it should be reasonably self-documenting, 
+      unambiguous, and ideally intuitive. Property names should not duplicate or resemble standard
+      Maven POM variables: it would be unwise to create a property named "${project.version}".
+      
+      A property that represents a field on a plugin or dependency will typically follow the
+      pattern of [ARTIFACT_ID].[FIELD_NAME]. Such property names don't need to include the names
+      of intermediate elements (such as "configuration") part of the path unless it's somehow
+      disambiguating or otherwise valuable to do so. For example, for the Maven compiler plugin:
+      
+      - ${maven-compiler-plugin.version} -> plugin/version
+      - ${maven-compiler-plugin.source}  -> plugin/configuration/source
+  -->
+  
+  <properties>
+    <!-- ====  General project properties  ===================================================== -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!--
+        BUILD TIMESTAMP. ${maven.build.timestamp} doesn't make it through to the filtering
+        mechanism, so we need to store it in another property.
+        See: http://java.dzone.com/tips/stamping-version-number-and
+    -->
+    <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
+    <timestamp>${maven.build.timestamp}</timestamp>
+    <!-- ====  Dependency versions  ============================================================ -->
+    <!--
+        Cyc/Cycorp dependency versionss
+    -->
+    <cyc-checkstyle-resources.version>0.1.0</cyc-checkstyle-resources.version>
+    <cyc-core-api.version>1.0.0-rc7.0</cyc-core-api.version>
+    <cyc-core-client-impl.version>1.0.0-rc7.0</cyc-core-client-impl.version>
+    <cyc-site-skin.version>1.0.0-rc2</cyc-site-skin.version>
+    <cyc-source-template-resources.version>0.1.0</cyc-source-template-resources.version>
+    <!--
+        Maven dependency versions
+    -->
+    <doxia-module-markdown.version>1.6</doxia-module-markdown.version>
+    <doxia-module-xhtml.version>1.6</doxia-module-xhtml.version>
+    <wagon-ssh.version>2.12</wagon-ssh.version>
+    <!--
+        Third-party dependency versions
+    -->
+    <jackson-core.version>2.8.6</jackson-core.version>
+    <svnkit.version>1.8.5</svnkit.version>
+    <!-- ====  Plugin versions  ================================================================ -->
+    <!--
+        PLUGIN VERSIONS for Maven (groupId=org.apache.maven.plugins)
+        Updated 2017-07-26 for Core API 1.0.0-rc7.0. Notes:
+        
+        maven-surefire-plugin:
+        - Version 2.19 breaks running single test in NetBeans.
+        -   See: https://netbeans.org/projects/java/lists/junit-issues/archive/2015-11/message/2
+        - Version 2.20 runs in NetBeans, but doesn't seem to display output in Test Results pane.
+    -->
+    <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
+    <maven-assembly-plugin.version>3.0.0</maven-assembly-plugin.version>
+    <maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
+    <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
+    <maven-compiler-plugin.source>1.7</maven-compiler-plugin.source>
+    <maven-compiler-plugin.target>1.7</maven-compiler-plugin.target>
+    <maven-failsafe-plugin.version>2.20</maven-failsafe-plugin.version>
+    <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
+    <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
+    <maven-jxr-plugin.version>2.5</maven-jxr-plugin.version>
+    <maven-project-info-reports-plugin.version>2.9</maven-project-info-reports-plugin.version>
+    <maven-site-plugin.version>3.6</maven-site-plugin.version>
+    <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
+    <maven-surefire-plugin.version>2.18</maven-surefire-plugin.version>
+    <!--
+        Third-party plugins. Notes:
+        
+        maven-jaxb2-plugin:
+        - Versions of this plugin before 0.9.0 may cause accessExternalSchema errors on Java 8.
+        - See: http://stackoverflow.com/a/26349908/786623
+        
+        versions-maven-plugin:
+        - Version 2.2 throws  java.io.FileNotFoundException on mvn versions:set
+        - See: https://github.com/mojohaus/versions-maven-plugin/issues/44
+    -->
+    <license-maven-plugin.version>1.7</license-maven-plugin.version>
+    <maven-jaxb2-plugin.version>0.10.0</maven-jaxb2-plugin.version>
+    <serviceloader-maven-plugin.version>1.0.2</serviceloader-maven-plugin.version>
+    <svn-revision-number-maven-plugin.version>1.13</svn-revision-number-maven-plugin.version>
+    <versions-maven-plugin.version>2.1</versions-maven-plugin.version>
+    <!-- ====  Plugin properties  ============================================================== -->
+    <!--
+        Maven plugin properties. Notes:
+        
+        maven-checkstyle-plugin:
+        - For stricter behavior, change maven-checkstyle-plugin.configLocation to google_checks.xml
+    -->
+    <maven-checkstyle-plugin.configLocation>google_checks-no_javadoc.xml</maven-checkstyle-plugin.configLocation>
+    <maven-compiler-plugin.source>1.7</maven-compiler-plugin.source>
+    <maven-compiler-plugin.target>1.7</maven-compiler-plugin.target>
+    <maven-site-plugin.stagingDirectory>/tmp/www/${project.artifactId}</maven-site-plugin.stagingDirectory>
+    <!--
+        Third-party plugin properties. Notes:
+        
+        versions-maven-plugin.generateBackupPoms:
+        - Determines whether to generate pom.xml.versionsBackup files 
+    -->
+    <license-maven-plugin.descriptionTemplate>headerTemplate.ftl</license-maven-plugin.descriptionTemplate>
+    <versions-maven-plugin.generateBackupPoms>false</versions-maven-plugin.generateBackupPoms>
+  </properties>
+  
+  <dependencyManagement>
+    <dependencies>
+      <!--
+          Core API
+      -->
+      <dependency>
+        <groupId>com.cyc</groupId>
+        <artifactId>cyc-core-api</artifactId>
+        <version>${cyc-core-api.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cyc</groupId>
+        <artifactId>cyc-core-api</artifactId>
+        <classifier>jar-with-dependencies</classifier>
+        <version>${cyc-core-api.version}</version>
+      </dependency>
+      <!--
+          Core Client Impl
+      -->
+      <dependency>
+        <groupId>com.cyc</groupId>
+        <artifactId>cyc-core-client-impl</artifactId>
+        <version>${cyc-core-client-impl.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cyc</groupId>
+        <artifactId>cyc-core-client-impl</artifactId>
+        <classifier>jar-with-dependencies</classifier>
+        <version>${cyc-core-client-impl.version}</version>
+      </dependency>
+      <!--
+          Cyc XML-related libraries
+      -->
+      <dependency>
+        <groupId>com.cyc.xml</groupId>
+        <artifactId>cyc-core-xml</artifactId>
+        <version>1.0.0-rc7.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cyc.xml</groupId>
+        <artifactId>cyc-cycconcepts</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cyc.xml</groupId>
+        <artifactId>cyc-lightweightresultset</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cyc.xml</groupId>
+        <artifactId>cyc-textprocessing</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+      <!--
+          Cyc JSON/serialization libraries
+      -->
+      <dependency>
+        <groupId>com.cyc.common</groupId>
+        <artifactId>cyc-core-serialization</artifactId>
+        <version>1.0.0-rc7.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cyc.json</groupId>
+        <artifactId>cyc-core-json</artifactId>
+        <version>1.0.0-rc7.0</version>
+      </dependency>
+      <!--
+          Test-scope libraries
+      -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.12</version>
+        <scope>test</scope>
+      </dependency>
+      <!--
+          Logging
+      -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.12</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>1.7.12</version>
+      </dependency>
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.17</version>
+      </dependency>
+      <!--
+          JSON
+      -->
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${jackson-core.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson-core.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson-core.version}</version>
+      </dependency>
+      <!--
+          XML
+      -->
+      <dependency>
+        <groupId>xerces</groupId>
+        <artifactId>xercesImpl</artifactId>
+        <version>2.10.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-impl</artifactId>
+        <version>2.2.6</version>
+      </dependency>
+      <!--
+          Build-related
+      -->
+      <dependency>
+        <groupId>org.atteo.classindex</groupId>
+        <artifactId>classindex</artifactId>
+        <version>3.1</version>
+      </dependency>
+      <!--
+          General-purpose utilities (collections, string formatting, etc.)
+      -->
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>18.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.4</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.5</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- ====  Apache plugins (i.e., groupId=org.apache.maven.plugins)  ==================== -->
+        <!--
+            NOTE: We don't need a groupId specification when the group is
+            org.apache.maven.plugins, because this is assumed by default.
+        -->
+        <plugin>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>${maven-antrun-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>${maven-assembly-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>${maven-checkstyle-plugin.version}</version>
+          <configuration>
+            <configLocation>${maven-checkstyle-plugin.configLocation}</configLocation>
+            <failOnViolation>false</failOnViolation>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>com.cyc.maven</groupId>
+              <artifactId>cyc-checkstyle-resources</artifactId>
+              <version>${cyc-checkstyle-resources.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <configuration>
+            <source>${maven-compiler-plugin.source}</source>
+            <target>${maven-compiler-plugin.target}</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${maven-failsafe-plugin.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${maven-jar-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <!-- 
+          See https://maven.apache.org/plugins/maven-project-info-reports-plugin/ 
+          -->
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>${maven-project-info-reports-plugin.version}</version>
+          <!--
+          <reportSets>
+            <reportSet>
+              <reports>
+                <report>index</report>
+                <report>plugin-management</report>
+                <report>distribution-management</report>
+                <report>dependency-info</report>
+                <report>mailing-list</report>
+                <report>issue-tracking</report>
+                <report>plugins</report>
+                <report>license</report>
+              </reports>
+            </reportSet>
+          </reportSets>
+          -->
+        </plugin>
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>${maven-site-plugin.version}</version>
+          <configuration>
+            <stagingDirectory>${maven-site-plugin.stagingDirectory}</stagingDirectory>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.maven.doxia</groupId>
+              <artifactId>doxia-module-markdown</artifactId>
+              <version>${doxia-module-markdown.version}</version>
+            </dependency>
+            <dependency> 
+              <groupId>org.apache.maven.doxia</groupId> 
+              <artifactId>doxia-module-xhtml</artifactId> 
+              <version>${doxia-module-xhtml.version}</version>
+            </dependency>
+            <!--
+            <dependency>
+              <groupId>org.apache.maven.wagon</groupId>
+              <artifactId>wagon-ssh</artifactId>
+              <version>${wagon-ssh.version}</version>
+            </dependency>
+            -->
+          </dependencies>
+        </plugin>
+        <plugin>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${maven-source-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>attach-sources</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-surefire-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>default-test</id>
+              <phase>test</phase>
+              <goals>
+                <goal>test</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <!-- ====  Third-party plugins  ======================================================== -->
+        <plugin>
+          <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
+          <artifactId>svn-revision-number-maven-plugin</artifactId>
+          <version>${svn-revision-number-maven-plugin.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.tmatesoft.svnkit</groupId>
+              <artifactId>svnkit</artifactId>
+              <version>${svnkit.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>eu.somatik.serviceloader-maven-plugin</groupId>
+          <artifactId>serviceloader-maven-plugin</artifactId>
+          <version>${serviceloader-maven-plugin.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>generate</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>${license-maven-plugin.version}</version>
+          <configuration>
+            <verbose>false</verbose>
+            <addSvnKeyWords>false</addSvnKeyWords>
+            <canUpdateDescription>true</canUpdateDescription>
+            <descriptionTemplate>${license-maven-plugin.descriptionTemplate}</descriptionTemplate>
+            <canUpdateCopyright>true</canUpdateCopyright>
+          </configuration>
+          <executions>
+            <execution>
+              <id>first</id>
+              <goals>
+                <goal>update-file-header</goal>
+              </goals>
+              <phase>process-sources</phase>
+              <configuration>
+                <licenseName>apache_v2</licenseName>
+                <roots>
+                  <root>src/main/java</root>
+                  <root>src/test</root>
+                </roots>
+              </configuration>
+            </execution>
+          </executions>
+          <dependencies>
+            <dependency>
+              <groupId>com.cyc.maven</groupId>
+              <artifactId>cyc-source-template-resources</artifactId>
+              <version>${cyc-source-template-resources.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>${versions-maven-plugin.version}</version>
+          <configuration>
+            <!-- Determines whether to generate pom.xml.versionsBackup files -->
+            <generateBackupPoms>${versions-maven-plugin.generateBackupPoms}</generateBackupPoms>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.jvnet.jaxb2.maven2</groupId>
+          <artifactId>maven-jaxb2-plugin</artifactId>
+          <version>${maven-jaxb2-plugin.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>generate</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <forceRegenerate>false</forceRegenerate>
+            <verbose>false</verbose>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <!--
+        This pom does not mandate the inclusion of any plugins.
+        
+        <plugins></plugins>
+    -->
+  </build>
+  
+  <profiles>
+    <!-- ====  Java 8 doc linting profile  ===================================================== -->
+    <profile>
+      <id>doclint-java8-disable</id>
+      <activation>
+        <jdk>1.8</jdk>
+      </activation> 
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <configuration>
+                <additionalparam>-Xdoclint:none</additionalparam>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <!-- ====  Java 7 doc linting profile  ===================================================== -->
+    <profile>
+      <id>doclint-java7-enable</id>
+      <activation>
+        <jdk>1.7</jdk>
+      </activation>
+      <!--
+      Nothing much to see here...
+      -->
+    </profile>
+    <!-- ====  Maven checkstyle profile  ======================================================= -->
+    <profile>
+      <id>checkstyle</id>
+      <build>
+        <plugins>
+          <plugin>
+            <!--
+                To run checkstyle from the command line:
+                
+                mvn clean validate -P checkstyle
+            -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>checkstyle</id>
+                <phase>validate</phase>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+                <configuration>
+                  <consoleOutput>true</consoleOutput>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+      <reporting>
+        <plugins>
+          <plugin>
+            <!--
+                To generate a checkstyle report, use the 'checkstyle' profile. E.g.:
+                
+                mvn clean site -P checkstyle
+            -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <version>${maven-checkstyle-plugin.version}</version>
+            <configuration>
+              <configLocation>${maven-checkstyle-plugin.configLocation}</configLocation>
+            </configuration>
+            <reportSets>
+              <reportSet>
+                <reports>
+                  <report>checkstyle</report>
+                </reports>
+              </reportSet>
+            </reportSets>
+          </plugin>
+          <plugin>
+            <!--
+                Generates a cross-reference of the project's sources; relevant to maven-checkstyle-plugin.
+                
+                See http://stackoverflow.com/questions/18766873/checkstyle-reports-not-showing-anything
+            -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jxr-plugin</artifactId>
+            <version>${maven-jxr-plugin.version}</version>
+          </plugin>
+        </plugins>
+      </reporting>
+    </profile>
+  </profiles>
+  
+  <!--
+      This pom does not perform a reactor build:
+      
+  <modules>
+  </modules>
+  -->
+  
+  <!--
+      This pom does not mandate the inclusion of any dependencies:
+      
+  <dependencies>
+  </dependencies>
+  -->
+  
+  <!-- ====|    Metadata & contact info    |==================================================== -->
   
   <url>http://dev.cyc.com/</url>
   
@@ -61,517 +697,5 @@
       <organizationUrl>http://www.cyc.com</organizationUrl>
     </developer>
   </developers>
-  
-  <!-- ====|    Configuration    |============================================================= -->
-  
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
-    <maven-compiler-plugin.source>1.6</maven-compiler-plugin.source>
-    <maven-compiler-plugin.target>1.6</maven-compiler-plugin.target>
-    
-    <!-- Library versions -->
-    <cyc-core-api.version>1.0.0-rc6</cyc-core-api.version>
-    <cyc-core-client-impl.version>1.0.0-rc6</cyc-core-client-impl.version>
-    <cyc-site-skin.version>1.0.0-rc2</cyc-site-skin.version>
-    
-    <jackson-core.version>2.8.6</jackson-core.version>
-    
-    <!-- maven.build.timestamp doesn't make it through to the filtering mechanism,
-         so we need to store it in another property. Details: 
-         http://java.dzone.com/tips/stamping-version-number-and
-    -->
-    <timestamp>${maven.build.timestamp}</timestamp>
-    <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
-    
-    <!--
-    For more strict behavior, change maven-checkstyle-plugin.configLocation to google_checks.xml
-    -->
-    <maven-checkstyle-plugin.configLocation>google_checks-no_javadoc.xml</maven-checkstyle-plugin.configLocation>
-    <maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
-    <license-maven-plugin.descriptionTemplate>headerTemplate.ftl</license-maven-plugin.descriptionTemplate>
-    
-    <!--
-    Version 2.2 of versions-maven-plugin throws a java.io.FileNotFoundException on mvn versions:set
-    https://github.com/mojohaus/versions-maven-plugin/issues/44
-    -->
-    <versions-maven-plugin.version>2.1</versions-maven-plugin.version>
-    <versions-maven-plugin.generateBackupPoms>false</versions-maven-plugin.generateBackupPoms>
-  </properties>
-  
-  <!--
-  This pom does not perform a reactor build.
-  <modules></modules>
-  -->
-  
-  <dependencyManagement>
-    <dependencies>
-      <!-- Core API -->
-      <dependency>
-        <groupId>com.cyc</groupId>
-        <artifactId>cyc-core-api</artifactId>
-        <version>${cyc-core-api.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.cyc</groupId>
-        <artifactId>cyc-core-api</artifactId>
-        <classifier>jar-with-dependencies</classifier>
-        <version>${cyc-core-api.version}</version>
-      </dependency>
-      
-      <!-- Core Client Impl -->
-      <dependency>
-        <groupId>com.cyc</groupId>
-        <artifactId>cyc-core-client-impl</artifactId>
-        <version>${cyc-core-client-impl.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.cyc</groupId>
-        <artifactId>cyc-core-client-impl</artifactId>
-        <classifier>jar-with-dependencies</classifier>
-        <version>${cyc-core-client-impl.version}</version>
-      </dependency>
-      
-      <!-- Cyc XML-related libraries -->
-      <dependency>
-        <groupId>com.cyc.xml</groupId>
-        <artifactId>cyc-core-xml</artifactId>
-        <version>1.0.0-rc5-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>com.cyc.xml</groupId>
-        <artifactId>cyc-cycconcepts</artifactId>
-        <version>1.0.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.cyc.xml</groupId>
-        <artifactId>cyc-lightweightresultset</artifactId>
-        <version>1.0.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.cyc.xml</groupId>
-        <artifactId>cyc-textprocessing</artifactId>
-        <version>1.0.0</version>
-      </dependency>
-      
-      <!-- Other Cyc libraries -->
-      <dependency>
-        <groupId>com.cyc.common</groupId>
-        <artifactId>cyc-core-serialization</artifactId>
-        <version>1.0.0-rc6-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>com.cyc.json</groupId>
-        <artifactId>cyc-core-json</artifactId>
-        <version>1.0.0-rc6-SNAPSHOT</version>
-      </dependency>
-      
-      <!-- Test-scope libraries -->
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.12</version>
-        <scope>test</scope>
-      </dependency>
-      
-      <!-- Logging -->
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>1.7.12</version>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <version>1.7.12</version>
-      </dependency>
-      <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <version>1.2.17</version>
-      </dependency>
-      
-      <!-- JSON -->
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${jackson-core.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>${jackson-core.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>${jackson-core.version}</version>
-      </dependency>
-      
-      <!-- XML -->
-      <dependency>
-        <groupId>xerces</groupId>
-        <artifactId>xercesImpl</artifactId>
-        <version>2.10.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.sun.xml.bind</groupId>
-        <artifactId>jaxb-impl</artifactId>
-        <version>2.2.6</version>
-      </dependency>
-      
-      <!-- Build-related -->
-      <dependency>
-        <groupId>org.atteo.classindex</groupId>
-        <artifactId>classindex</artifactId>
-        <version>3.1</version>
-      </dependency>
-      
-      <!-- JDK enhancements -->
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>18.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>3.4</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>2.5</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-  
-  <!--
-  This pom does not mandate the inclusion of any dependencies.
-  <dependencies></dependencies>
-  -->
-  
-  <build>
-    <pluginManagement>
-      <!-- ====  Apache plugins (i.e., groupId=org.apache.maven.plugins)  ====================== -->
-      <plugins>
-        <plugin>
-          <!-- NOTE: We don't need a groupId specification when the group is
-              org.apache.maven.plugins, because this is assumed by default.
-          -->
-          <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.8</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.6</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>${maven-checkstyle-plugin.version}</version>
-          <configuration>
-            <configLocation>${maven-checkstyle-plugin.configLocation}</configLocation>
-            <failOnViolation>false</failOnViolation>
-          </configuration>
-          <dependencies>
-            <dependency>
-              <groupId>com.cyc.maven</groupId>
-              <artifactId>cyc-checkstyle-resources</artifactId>
-              <version>0.1.0</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>${maven-compiler-plugin.version}</version>
-          <configuration>
-            <source>${maven-compiler-plugin.source}</source>
-            <target>${maven-compiler-plugin.target}</target>
-          </configuration>
-        </plugin>
-         <plugin>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <version>2.19</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>integration-test</goal>
-                <goal>verify</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>${maven-javadoc-plugin.version}</version>
-          <executions>
-            <execution>
-              <id>attach-javadocs</id>
-              <goals>
-                <goal>jar</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <!-- 
-          See https://maven.apache.org/plugins/maven-project-info-reports-plugin/ 
-          -->
-          <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>2.8.1</version>
-          <!--
-          <reportSets>
-            <reportSet>
-              <reports>
-                <report>index</report>
-                <report>plugin-management</report>
-                <report>distribution-management</report>
-                <report>dependency-info</report>
-                <report>mailing-list</report>
-                <report>issue-tracking</report>
-                <report>plugins</report>
-                <report>license</report>
-              </reports>
-            </reportSet>
-          </reportSets>
-          -->
-        </plugin>
-        <plugin>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>3.4</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.apache.maven.wagon</groupId>
-              <artifactId>wagon-ssh</artifactId>
-              <version>2.10</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-        <plugin>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>${maven-source-plugin.version}</version>
-          <executions>
-            <execution>
-              <id>attach-sources</id>
-              <goals>
-                <goal>jar</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <!--
-          Version 2.19 breaks running single test in NetBeans.
-          See: https://netbeans.org/projects/java/lists/junit-issues/archive/2015-11/message/2
-          -->
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.18</version>
-          <executions>
-            <execution>
-              <id>default-test</id>
-              <phase>test</phase>
-              <goals>
-                <goal>test</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        
-        <!-- ====  Third-party plugins  ======================================================== -->
-        <plugin>
-          <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
-          <artifactId>svn-revision-number-maven-plugin</artifactId>
-          <version>1.13</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.tmatesoft.svnkit</groupId>
-              <artifactId>svnkit</artifactId>
-              <version>1.8.5</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-        <plugin>
-          <groupId>eu.somatik.serviceloader-maven-plugin</groupId>
-          <artifactId>serviceloader-maven-plugin</artifactId>
-          <version>1.0.2</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>generate</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>license-maven-plugin</artifactId>
-          <version>1.7</version>
-          <configuration>
-            <verbose>false</verbose>
-            <addSvnKeyWords>false</addSvnKeyWords>
-            <canUpdateDescription>true</canUpdateDescription>
-            <descriptionTemplate>${license-maven-plugin.descriptionTemplate}</descriptionTemplate>
-            <canUpdateCopyright>true</canUpdateCopyright>
-          </configuration>
-          <executions>
-            <execution>
-              <id>first</id>
-              <goals>
-                <goal>update-file-header</goal>
-              </goals>
-              <phase>process-sources</phase>
-              <configuration>
-                <licenseName>apache_v2</licenseName>
-                <roots>
-                  <root>src/main/java</root>
-                  <root>src/test</root>
-                </roots>
-              </configuration>
-            </execution>
-          </executions>
-          <dependencies>
-            <dependency>
-              <groupId>com.cyc.maven</groupId>
-              <artifactId>cyc-source-template-resources</artifactId>
-              <version>0.1.0</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>versions-maven-plugin</artifactId>
-          <version>${versions-maven-plugin.version}</version>
-          <configuration>
-            <!-- Determines whether to generate pom.xml.versionsBackup files -->
-            <generateBackupPoms>${versions-maven-plugin.generateBackupPoms}</generateBackupPoms>
-          </configuration>
-        </plugin>
-        <plugin>
-          <!--
-          Versions of this plugin earlier than 0.9.0 may cause throw
-          accessExternalSchema errors on Java 8.
-          http://stackoverflow.com/a/26349908/786623
-          -->
-          <groupId>org.jvnet.jaxb2.maven2</groupId>
-          <artifactId>maven-jaxb2-plugin</artifactId>
-          <version>0.10.0</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>generate</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <forceRegenerate>false</forceRegenerate>
-            <verbose>false</verbose>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-    
-    <!--
-    This pom does not mandate the inclusion of any plugins.
-    <plugins></plugins>
-    -->
-  </build>
-  
-  <profiles>
-    <!-- ====  Java 8 doc linting profile ====================================================== -->
-    <profile>
-      <id>doclint-java8-disable</id>
-      <activation>
-        <jdk>1.8</jdk>
-      </activation> 
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-javadoc-plugin</artifactId>
-              <configuration>
-                <additionalparam>-Xdoclint:none</additionalparam>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-    
-    <!-- ====  Java 7 doc linting profile ====================================================== -->
-    <profile>
-      <id>doclint-java7-enable</id>
-      <activation>
-        <jdk>1.7</jdk>
-      </activation>
-      <!--
-      Nothing much to see here...
-      -->
-    </profile>
-    
-    <!-- ====  Maven checkstyle profile ====================================================== -->
-    <profile>
-      <id>checkstyle</id>
-      <build>
-        <plugins>
-          <plugin>
-            <!--
-            To run checkstyle from the command line:
-            
-            mvn clean validate -P checkstyle
-            -->
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>checkstyle</id>
-                <phase>validate</phase>
-                <goals>
-                  <goal>check</goal>
-                </goals>
-                <configuration>
-                  <consoleOutput>true</consoleOutput>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-      <reporting>
-        <plugins>
-          <plugin>
-            <!--
-            To generate a checkstyle report, use the 'checkstyle' profile. E.g.:
-            
-            mvn clean site -P checkstyle
-            -->
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <version>${maven-checkstyle-plugin.version}</version>
-            <configuration>
-              <configLocation>${maven-checkstyle-plugin.configLocation}</configLocation>
-            </configuration>
-            <reportSets>
-              <reportSet>
-                <reports>
-                  <report>checkstyle</report>
-                </reports>
-              </reportSet>
-            </reportSets>
-          </plugin>
-          <plugin>
-            <!--
-            Generates a cross-reference of the project's sources; relevant to maven-checkstyle-plugin.
 
-            See http://stackoverflow.com/questions/18766873/checkstyle-reports-not-showing-anything
-            -->
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jxr-plugin</artifactId>
-            <version>2.5</version>
-          </plugin>
-        </plugins>
-      </reporting>
-    </profile>
-  </profiles>
-  
 </project>
